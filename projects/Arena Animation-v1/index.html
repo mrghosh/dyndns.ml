@@ -1,0 +1,249 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>LAKM&#201; INDIA</title>
+<link type="text/css" rel="stylesheet" href="css/font-awesome.min.css" media="screen">
+<link type="text/css" rel="stylesheet" href="css/kube.min.css" media="screen">
+<link rel="stylesheet" href="css/wallop.css">
+<link rel="stylesheet" href="css/wallop--fade.css">
+<link type="text/css" rel="stylesheet" href="css/main.css" media="screen">
+<script src="js/jquery.min.js"></script>
+<script src="js/kube.min.js"></script>
+<script src="js/wallop.min.js"></script>
+</head>
+<body>
+
+<!--=============================================================================START Show header for large screens-->
+<div class="row header hide-sm" data-component="sticky_disabled">
+	<div class="col col-1">
+
+	</div>
+    <div class="col col-2">
+		<div class="row align-center">
+			<div class="col col-10 logo"><img class="logo_img" src="img/logo.png" alt="" width="200px" height="auto" border="0"/></div>
+		</div>
+	</div>
+    <div class="col col-8">
+		<div class="row header_1">
+			<div class="col col-9"></br></div>
+			<div class="col col-3 account">
+				<span id="account_1"><i class="fa fa-search fa-white fa-fw" aria-hidden="true"></i>&nbsp&nbsp&nbsp<span onclick="show_cart_popup()"><i class="fa fa-shopping-bag fa-white fa-fw" aria-hidden="true"></i>
+				<!--<span class="fa-stack">
+				<i class="fa fa-circle fa-stack-2x"></i>
+				<strong class="fa-stack-1x" style="color:white;" id="cart_count"></strong>
+				</span>-->
+				<span id="cart_count" class="label badge error">0</span></span>&nbsp&nbsp<i class="fa fa-user fa-white fa-fw" aria-hidden="true"></i></span>
+			</div>
+		</div>
+		<div class="row header_1 menu hide-sm">
+			<div class="col col-2 menu_item">HOME</div>
+			<div class="col col-2 menu_item">ABOUT</div>
+			<div class="col col-2 menu_item">PRODUCTS</div>
+			<div class="col col-2 menu_item">FASHION</div>
+			<div class="col col-2 menu_item">CONTACT</div>
+			<div class="col col-2 menu_item">SITEMAP</div>
+		</div>
+	</div>
+	<div class="col col-1"></div>
+</div>
+<!--END Show header for large screens=============================================================================-->
+
+<!--=============================================================================START Show Different header in small screens-->
+<div class="row show-sm" data-component="sticky">
+	<div class="col col-12 sm_header1">
+		<a href="#" class="sm_menu show-sm" data-component="offcanvas" data-target="#offcanvas-left"><i class="kube-menu"></i></a>&nbsp&nbsp
+		<img src="img/logo.png" alt="" width="100" height="auto" border="0" />
+		<span id="sm_account">
+			<i class="fa fa-search fa-white fa-fw" aria-hidden="true"></i>&nbsp&nbsp<span onclick="show_cart_popup()"><i class="fa fa-shopping-bag fa-white fa-fw" aria-hidden="true"></i><span id="cart_count_sm" class="label badge error">0</span></span>&nbsp&nbsp<i class="fa fa-user fa-white fa-fw" aria-hidden="true"></i>
+		</span>
+	</div>
+</div>
+<div id="offcanvas-left" class="hide">
+    <nav>
+		<p style="text-align:center;"><span style='color:grey;text-decoration:line-through'><span style='color:white'>____</span></span> MENU <span style='color:grey;text-decoration:line-through'><span style='color:white'>____</span></span></p>
+        <ul>
+            <li><a href="" style="color:black;">HOME</a></li><br>
+            <li><a href="" style="color:black;">ABOUT</a></li><br>
+            <li><a href="" style="color:black;">PRODUCTS</a></li><br>
+            <li><a href="" style="color:black;">FASHION WEEK</a></li><br>
+            <li><a href="" style="color:black;">CONTACT</a></li><br>
+            <li><a href="" style="color:black;">SITEMAP</a></li>
+        </ul>
+    </nav>
+</div>
+<!--END Show Different header in small screens=============================================================================-->
+
+<!--=============================================================================START sticky header-->
+<div class="row hide-sm" data-component="sticky" style="display:none;" id="sticky_header">
+	<div class="col col-12 sm_header1">
+		<a href="#" class="sm_menu show-sm_disable" data-component="offcanvas" data-target="#offcanvas-left"><i class="kube-menu"></i></a>&nbsp&nbsp
+		<img src="img/logo.png" alt="" width="100" height="auto" border="0" />
+		<span id="sm_account">
+			<i class="fa fa-search fa-white fa-fw" aria-hidden="true"></i>&nbsp&nbsp<span onclick="show_cart_popup()"><i class="fa fa-shopping-bag fa-white fa-fw" aria-hidden="true"></i><span id="cart_count_sm" class="label badge error">0</span></span>&nbsp&nbsp<i class="fa fa-user fa-white fa-fw" aria-hidden="true"></i>
+		</span>
+	</div>
+</div>
+<div id="offcanvas-left" class="hide">
+    <nav>
+		<p style="text-align:center;"><span style='color:grey;text-decoration:line-through'><span style='color:white'>____</span></span> MENU <span style='color:grey;text-decoration:line-through'><span style='color:white'>____</span></span></p>
+        <ul>
+            <li><a href="" style="color:black;">HOME</a></li><br>
+            <li><a href="" style="color:black;">ABOUT</a></li><br>
+            <li><a href="" style="color:black;">PRODUCTS</a></li><br>
+            <li><a href="" style="color:black;">FASHION WEEK</a></li><br>
+            <li><a href="" style="color:black;">CONTACT</a></li><br>
+            <li><a href="" style="color:black;">SITEMAP</a></li>
+        </ul>
+    </nav>
+</div>
+<!--END START sticky header=============================================================================-->
+
+<!--=============================================================================START Slide banner-->
+<div class="row"><div class="col col-12">
+	<div class="Wallop Wallop--fade">
+		<div class="Wallop-item"><img src="img/ban1.jpg" alt=""/></div>
+		<div class="Wallop-item"><img src="img/ban2.jpg" alt=""/></div>
+		<div class="Wallop-item"><img src="img/ban3.jpg" alt=""/></div>
+	 </div>
+	<script>
+	var wallopEl = document.querySelector('.Wallop');
+	var wallop = new Wallop(wallopEl);
+	autoplay(5000);
+	function autoplay(interval) {
+	  var lastTime = 0;  
+	  function frame(timestamp) {
+		var update = timestamp - lastTime >= interval;
+		if (update) {
+		  wallop.next();
+		  lastTime = timestamp;
+		}
+		requestAnimationFrame(frame);
+	  }
+	  requestAnimationFrame(frame);
+	};
+	</script>
+</div></div>
+<!--END Slide banner=============================================================================-->
+<br>
+<!--=============================================================================START browse category-->
+<div class="row"><div class="col col-12 large" style="text-align:center;"><span style='color:grey;text-decoration:line-through'><span style='color:white' class="hide-sm">__________</span></span><font size=""> BROWSE OUR CATEGORIES </font><span style='color:grey;text-decoration:line-through'><span style='color:white' class="hide-sm">__________</span></span></div></div><br>
+<div class="row">
+	<div class="col col-1"></div>
+	<div class="col col-10">
+		<div class="row gutters">
+			
+			<div class="col col-3 home_browse_category"><img src="img/1.png" alt="" width="" height="" border="0" /></div>
+			<div class="col col-3 home_browse_category"><img src="img/2.png" alt="" width="" height="" border="0" /></div>
+			<div class="col col-3 home_browse_category"><img src="img/4.png" alt="" width="" height="" border="0" /></div>
+			<div class="col col-3 home_browse_category"><img src="img/3.png" alt="" width="" height="" border="0" /></div>
+			
+		</div>
+	</div>
+	<div class="col col-1"></div>
+</div>
+<!--END browse category=============================================================================-->
+
+<!--=============================================================================START products tab hidden on small screen-->
+<br class="hide-sm"><br class="hide-sm"><div class="row hide-sm"><div class="col col-12 large" style="text-align:center;"><span style='color:grey;text-decoration:line-through'><span style='color:white' class="hide-sm">__________</span></span><font size=""> TOP PRODUCTS </font><span style='color:grey;text-decoration:line-through'><span style='color:white' class="hide-sm">__________</span></span></div></div><br>
+
+<div class="row hide-sm">
+<div class="col col-1"></div>
+<div class="col col-10">
+	<nav class="tabs" data-component="tabs">
+		<ul>
+			<li class="active"><a href="#tab1">NEW ARRIVALS</a></li>
+			<li><a href="#tab2">TOP OFFERS</a></li>
+			<li><a href="#tab3">VIEW ALL</a></li>
+		</ul>
+	</nav>
+	<div id="tab1">
+		<!--<div class="homepage_product">
+			<div class="homepage_product_1">
+				<div class="homepage_product_1_img"><img src="nail.jpg" alt="" width="" height="" border="0" /></div>
+				<div class="homepage_product_1_desc"></div>
+			</div>
+		</div>
+		<div class="homepage_product">
+			<div class="homepage_product_1">
+				<div class="homepage_product_1_img"><img src="lipstick.jpg" alt="" width="" height="" border="0" /></div>
+				<div class="homepage_product_1_desc"></div>
+			</div>
+		</div>
+		<div class="homepage_product">
+			<div class="homepage_product_1">
+				<div class="homepage_product_1_img"><img src="foundation.jpg" alt="" width="" height="" border="0" /></div>
+				<div class="homepage_product_1_desc"></div>
+			</div>
+		</div>-->
+		<div class="row gutters">
+			<div class="col col-4 home_prod_box"><img src="img/nail.jpg" alt="" width="" height="" border="0" /><br><br>Lakm&#233; 9to5 Nail Enamel<br>9 ml<br><s>&#8377;320</s> &#8377;220</div>
+			<div class="col col-4 home_prod_box"><img src="img/lipstick.jpg" alt="" width="" height="" border="0" /><br><br>Lakm&#233; 9to5 Lip Color<br>3.7g Shade-W278<br><s>&#8377;270</s> &#8377;201</div>
+			<div class="col col-4 home_prod_box"><img src="img/foundation.jpg" alt="" width="" height="" border="0" /><br><br>Lakm&#233; 9to5 Weightless Mousse Foundation<br>29g Rose honey<br><s>&#8377;575</s> &#8377;430</div>
+		</div>
+	</div>
+	<div id="tab2">
+		<div class="row gutters">
+			<div class="col col-4 home_prod_box"><img src="img/foundation.jpg" alt="" width="" height="" border="0" /><br><br>Lakm&#233; 9to5 Weightless Mousse Foundation<br>29g Rose honey<br><s>&#8377;575</s> &#8377;430</div>
+			<div class="col col-4 home_prod_box"><img src="img/nail.jpg" alt="" width="" height="" border="0" /><br><br>Lakm&#233; 9to5 Nail Enamel<br>9 ml<br><s>&#8377;320</s> &#8377;220</div>
+			<div class="col col-4 home_prod_box"><img src="img/lipstick.jpg" alt="" width="" height="" border="0" /><br><br>Lakm&#233; 9to5 Lip Color<br>3.7g Shade-W278<br><s>&#8377;270</s> &#8377;201</div>
+		</div>
+	</div>
+	<div id="tab3">
+		<div class="row gutters">
+			<div class="col col-4 home_prod_box"><img src="img/lipstick.jpg" alt="" width="" height="" border="0" /><br><br>Lakm&#233; 9to5 Lip Color<br>3.7g Shade-W278<br><s>&#8377;270</s> &#8377;201</div>
+			<div class="col col-4 home_prod_box"><img src="img/foundation.jpg" alt="" width="" height="" border="0" /><br><br>Lakm&#233; 9to5 Weightless Mousse Foundation<br>29g Rose honey<br><s>&#8377;575</s> &#8377;430</div>
+			<div class="col col-4 home_prod_box"><img src="img/nail.jpg" alt="" width="" height="" border="0" /><br><br>Lakm&#233; 9to5 Nail Enamel<br>9 ml<br><s>&#8377;320</s> &#8377;220</div>
+	</div>
+	</div>
+</div>
+<div class="col col-1"></div>
+</div>
+<!--END products tab hidden on small screen=============================================================================-->
+
+<br class="hide-sm"><br class="hide-sm">
+<div class="row fashion">
+	<a href="#"><img src="img/fashion week.jpg" width="100%" alt=""></a>
+</div>
+
+<div class="row footer">
+	<div class="col col-1"></div>
+	<div class="col col-5 footer_menu">
+		<span class="footer_menu_item">ABOUT LAKME</span>
+		<span class="footer_menu_item">CONTACTS</span>
+		<span class="footer_menu_item">SITEMAP</span>
+	</div>
+	<div class="col col-5 footer_social">
+		<span class="">JOIN US ON: &nbsp&nbsp<i class="fa fa-facebook" aria-hidden="true"></i>&nbsp&nbsp<i class="fa fa-instagram" aria-hidden="true"></i>&nbsp&nbsp<i class="fa fa-twitter" aria-hidden="true"></i></span>
+	</div>
+	<div class="col col-1"></div>
+</div>
+<div class="row footer">
+	<div class="col col-1"></div>
+	<div class="col col-5 footer_newsletter">
+		<form method="post" action="" class="form">
+			<div class="form-item">
+				<div class="append">
+					<input type="text" name="search" placeholder="Please Enter Your Email">
+					<button class="button outline">Subscribe To Newsletter</button>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="col col-5 footer_copyright">
+		<span class="">&copy 2017 LAKM&#201 | PRIVACY POLICY</span>
+	</div>
+	<div class="col col-1"></div>
+</div>
+
+<script>
+$(window).scroll(function(){
+    var scrollPos = $(document).scrollTop();
+    //console.log(scrollPos);
+	if(scrollPos>=100)document.getElementById("sticky_header").style.display = "block";
+	if(scrollPos<100)document.getElementById("sticky_header").style.display = "none";
+});
+</script>
+</body>
+</html>
