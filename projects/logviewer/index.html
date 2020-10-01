@@ -1,0 +1,406 @@
+<!--
+===========================TODO=======================================
+1. change color. different color for info, debug, critical etc.
+http://www.tedmontgomery.com/tutorial/clrctgBL.html
+
+2. scroll up little bit buggy because we are deleting the old messages. deleting messages reduces the scrollTop value. we can also use a dedicated button for pause and run instead
+
+3. search feature
+
+4. an option to clear whole screen
+
+-->
+<html>
+<head>
+<link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
+<style>
+body{
+  background-color:#252525;
+  color:#f2f2f2;
+  padding-left:5%;
+  padding-right:5%;
+  margin-bottom:2%;
+  font-family: 'Roboto Mono', monospace;
+  font-size:small;
+}
+#logviewer{
+  margin-top:5%;
+  overflow-y: scroll;
+  height:80%;
+}
+#info-box {
+	color:black;
+	padding: 5px;
+	background: #fafafa;
+}
+.date-time{
+	color: #249CE3;
+}
+.message-level{
+	color: #EE3C93;
+}
+.path{
+	color: orange;
+}
+.ip{
+	padding-left:4px;
+	padding-right:4px;
+	background: #60FF60;
+	color:black;
+}
+.mac{
+	padding-left:4px;
+	padding-right:4px;
+	background: cyan;
+	color:black;
+	
+}
+.bracket{
+	color: violet;
+}
+.capital{
+	font-weight:bold;
+	
+}
+.quote{
+	color:#FFFF36;
+}
+.url{
+	color: pink;
+}
+.kernel{
+	background:#CB0000;
+	color:black;
+	padding-left:4px;
+	padding-right:4px;
+}
+.tag{
+	text-decoration:underline;
+	background:#4f4f4f;
+	padding-left:4px;
+	padding-right:4px;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+	border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+    background: #888; 
+	border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #555; 
+}
+</style>
+</head>
+<body>
+<!--DATE HOSTNAME TAG: MESSAGE-->
+<div id="logviewer">
+	
+</div>
+<div id="info-box" style="display: none;" onclick="document.getElementById('info-box').style.display='none';document.getElementById('logviewer').lastChild.scrollIntoView(false);mouseup=false;unreadCount=0;document.getElementById('unread_count').innerHTML=''"><center><b>Click here to return to live view <span id="unread_count"></span></b></center></div>
+<!--<div id="scroll"></div>
+<span style="color: #249CE3">Text007_hi</span><span style="color: #E2AB00">Text007_hi</span><span style="color: #30BCAD">Text007_hi</span><span style="color: #EE3C93">Text007_hi</span><span style="color: #FFFF36">Text007_hi</span><span style="color: #60FF60">Text007_hi</span>-->
+<script>
+alert("This is just for demonstration. Random log messages are being shown every 100ms.");
+var mouseup=false, count=0, unreadCount=0, lastScrollTop = 0;
+const parent = document.getElementById('logviewer');
+
+/*window.addEventListener('wheel', function(e) {
+  if (e.deltaY < 0) {
+    mouseup=true;
+	document.getElementById('info-box').style.display='block'
+  }
+});*/
+
+<!--BELOW https://stackoverflow.com/questions/31223341/detecting-scroll-direction-->
+var lastScrollTop = 0;
+parent.addEventListener("scroll", function(){ // or window.addEventListener("scroll"....
+   var st = parent.scrollTop;
+   //document.getElementById('scroll').innerHTML=st;
+   if (lastScrollTop-st>=20){
+      mouseup=true;
+	  document.getElementById('info-box').style.display='block'
+	}
+   lastScrollTop = st <= 0 ? 0 : st; // For Mobile or negative scrolling
+}, false);
+
+
+function getMessage(){
+	var index=Math.floor(Math.random() * lines.length)
+	var formattedMessage=formatMessage(lines[index])
+	
+	var node = document.createElement("p");
+	node.innerHTML=formattedMessage;
+	parent.appendChild(node);
+	if(!mouseup)parent.lastChild.scrollIntoView(false)
+	<!--SEE ALSO https://stackoverflow.com/questions/25505778/automatically-scroll-down-chat-div -->
+	count++
+	if (count>=500 && !mouseup){
+		parent.removeChild(parent.getElementsByTagName('p')[0]);
+	}
+	if (mouseup){
+			unreadCount++;
+			document.getElementById("unread_count").innerHTML=" ("+unreadCount+"+ New events)";
+	}
+}
+setInterval(getMessage, 100);
+function formatMessage(message){
+	//text within quote
+	regexp = /(['"][\w-\.]+['"])/gi
+	var result = message.replace(regexp, '<span class="quote">$1</span>')
+	//date-time
+	var regexp = /(^.+?)(\d{2}:\d{2}:\d{2})(\s\d{4})/i
+	var result = result.replace(regexp, '<span class="date-time">$1<u>$2</u>$3</span>')
+	//process tag ==NOT ALL BROWSERS SUPPORT POSITIVE OR NEGATIVE LOOK BEHIND==
+	regexp = /(?<=\.(?:debug|info|notice|warn|err|crit|alert|emerg)\s)([\w\[\]-]+?)(?=:)/i
+	result = result.replace(regexp, '<span class="tag">$1</span>')
+	//message type
+	regexp = /(\b[\w]+?\.(?:debug|info|notice|warn|err|crit|alert|emerg))/i
+	result = result.replace(regexp, '<b><span class="message-level">$1</span></b>')
+	//path
+	var regexp = /(\/(?:bin|boot|dev|etc|home|lib|media|mnt|opt|proc|root|sbin|srv|tmp|usr|initrd|var|lost\+found)[\/\.\w-]*)/gi
+	var result = result.replace(regexp, '<span class="path">$1</span>')
+	//ip
+	var regexp = /(\b[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}[:]*[\d]{0,5}\b)/gi
+	var result = result.replace(regexp, '<span class="ip">$1</span>')
+	//mac
+	var regexp = /(\b[a-fA-F\d]{2}[:-][a-fA-F\d]{2}[:-][a-fA-F\d]{2}[:-][a-fA-F\d]{2}[:-][a-fA-F\d]{2}[:-][a-fA-F\d]{2}\b)/gi
+	var result = result.replace(regexp, '<span class="mac">$1</span>')
+	//third bracket and colon
+	var regexp = /([\[\]\(\)])/gi
+	var result = result.replace(regexp, '<span class="bracket">$1</span>')
+	//url and email
+	regexp = /((?:http(?:s)?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*)(?!<\/span>))/gi
+	result = result.replace(regexp, '<span class="url">$1</span>')
+	//letter-digit in capital
+	regexp = /(\b[0-9]*[A-Z]{1}[A-Z0-9-_]{1,}[A-Z0-9]{1}\b)/g
+	result = result.replace(regexp, '<span class="capital">$1</span>')
+	
+
+	return result
+}
+
+/*
+var lines=log.split("\n")
+for(var x in lines){
+	//text within quote
+	regexp = /(['"][\w-\.]+['"])/gi
+	var result = lines[x].replace(regexp, '<span style="color: grey">$1</span>')
+}
+*/
+
+var log=`Fri Sep 14 17:25:00 2018 cron.info crond[2398]: USER root pid 22185 cmd killall -HUP dnsmasq
+Fri Sep 14 17:25:00 2018 cron.info crond[2398]: USER root pid 22186 cmd /usr/sbin/ff_olsr_watchdog
+Fri Sep 14 17:25:00 2018 daemon.info dnsmasq[1994]: read /etc/hosts - 4 addresses
+Fri Sep 14 17:25:00 2018 daemon.info dnsmasq[1994]: read /tmp/hosts/dhcp.cfg02411c - 2 addresses
+Fri Sep 14 17:25:00 2018 daemon.info dnsmasq-dhcp[1994]: read /etc/ethers - 0 addresses
+Fri Sep 14 18:04:43 2018 user.notice root: hi
+Fri Sep 14 17:04:48 2018 daemon.info hostapd: wlan0: STA 28:d3:47:d2:fa:64 WPA: group key handshake completed (RSN)
+Fri Sep 14 17:04:48 2018 daemon.info hostapd: wlan0: STA 4c:49:5c:61:db:4a WPA: group key handshake completed (RSN)
+Fri Sep 14 17:04:51 2018 daemon.notice hostapd: wlan0: AP-STA-DISCONNECTED 40:41:da:17:3b:b8
+Fri Sep 14 17:04:56 2018 daemon.info hostapd: wlan0: STA 40:41:da:17:3b:b8 IEEE 802.11: deauthenticated due to local deauth request
+Fri Sep 14 17:05:11 2018 daemon.info hostapd: wlan0: STA 40:41:da:17:3b:b8 IEEE 802.11: authenticated
+Fri Sep 14 17:05:11 2018 daemon.info hostapd: wlan0: STA 40:41:da:17:3b:b8 IEEE 802.11: associated (aid 2)
+Fri Sep 14 17:05:11 2018 daemon.notice hostapd: wlan0: AP-STA-CONNECTED 40:41:da:17:3b:b8
+Fri Sep 14 17:05:11 2018 daemon.info hostapd: wlan0: STA 40:41:da:17:3b:b8 RADIUS: starting accounting session 4A05F64E351F25A8
+Fri Sep 14 17:05:11 2018 daemon.info hostapd: wlan0: STA 40:41:da:17:3b:b8 WPA: pairwise key handshake completed (RSN)
+Fri Sep 14 17:05:12 2018 daemon.info dnsmasq-dhcp[1994]: DHCPREQUEST(br-lan) 192.168.8.105 40:41:da:17:3b:b8
+Fri Sep 14 17:05:12 2018 daemon.info dnsmasq-dhcp[1994]: DHCPACK(br-lan) 192.168.8.105 40:41:da:17:3b:b8
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   10.761905] eth0: link up (100Mbps/Full duplex)
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   10.765028] IPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready
+Thu Sep 13 21:00:36 2018 kern.notice kernel: [   11.150834] jffs2: notice: (410) jffs2_build_xattr_subsystem: complete building xattr subsystem, 1 of xdatum (1 unchecked, 0 orphan) and 1 of xref (0 dead, 0 orphan) found.
+Thu Sep 13 21:00:36 2018 user.info kernel: [   11.169967] mount_root: switching to jffs2 overlay
+Thu Sep 13 21:00:36 2018 user.warn kernel: [   11.189594] urandom-seed: Seeding with /etc/urandom.seed
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   11.456150] eth0: link down
+Thu Sep 13 21:00:36 2018 user.info kernel: [   11.477408] procd: - early -
+Thu Sep 13 21:00:36 2018 user.info kernel: [   11.478984] procd: - watchdog -
+Thu Sep 13 21:00:36 2018 user.info kernel: [   12.350825] procd: - watchdog -
+Thu Sep 13 21:00:36 2018 user.info kernel: [   12.352938] procd: - ubus -
+Thu Sep 13 21:00:36 2018 kern.notice kernel: [   12.956507] random: ubusd: uninitialized urandom read (4 bytes read, 22 bits of entropy available)
+Thu Sep 13 21:00:36 2018 kern.notice kernel: [   12.976101] random: ubusd: uninitialized urandom read (4 bytes read, 22 bits of entropy available)
+Thu Sep 13 21:00:36 2018 user.info kernel: [   13.183678] procd: - init -
+Thu Sep 13 21:00:36 2018 kern.notice kernel: [   14.219780] random: jshn: uninitialized urandom read (4 bytes read, 24 bits of entropy available)
+Thu Sep 13 21:00:36 2018 kern.notice kernel: [   14.429536] random: ubusd: uninitialized urandom read (4 bytes read, 24 bits of entropy available)
+Thu Sep 13 21:00:36 2018 kern.notice kernel: [   14.452825] random: ubus: uninitialized urandom read (4 bytes read, 24 bits of entropy available)
+Thu Sep 13 21:00:36 2018 user.info kernel: [   15.249508] kmodloader: loading kernel modules from /etc/modules.d/
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   15.820641] ntfs: driver 2.1.32 [Flags: R/O MODULE].
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   15.866726] Initializing XFRM netlink socket
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   15.884331] NET: Registered protocol family 15
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   15.894146] tun: Universal TUN/TAP device driver, 1.6
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   15.897750] tun: (C) 1999-2004 Max Krasnyansky <maxk@qualcomm.com>
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   16.024601] l2tp_core: L2TP core driver, V2.0
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   16.043057] l2tp_netlink: L2TP netlink interface
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   16.065108] gre: GRE over IPv4 demultiplexor driver
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   16.075139] ip_gre: GRE over IPv4 tunneling driver
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   16.114734] ip6_tables: (C) 2000-2006 Netfilter Core Team
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   16.214427] Netfilter messages via NETLINK v0.30.
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   16.236343] ip_set: protocol 6
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   16.356221] i2c /dev entries driver
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   16.386160] Linux video capture interface: v2.00
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   16.541440] u32 classifier
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   16.542697]     input device check on
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   16.546341]     Actions configured
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   16.569073] Mirror/redirect action on
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   16.602941] nf_conntrack version 0.5.0 (940 buckets, 3760 max)
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   16.747498] fuse init (API version 7.23)
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   16.786188] arp_tables: (C) 2002 David S. Miller
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   16.810566] usbcore: registered new interface driver cdc_acm
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   16.814777] cdc_acm: USB Abstract Control Model driver for USB modems and ISDN adapters
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   16.854273] usbcore: registered new interface driver cdc_wdm
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   16.866559] Loading modules backported from Linux version wt-2017-01-31-0-ge882dff19e7f
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   16.873170] Backport generated by backports.git backports-20160324-13-g24da7d3c
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   16.955181] ip_tables: (C) 2000-2006 Netfilter Core Team
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   16.965441] usbcore: registered new interface driver ipheth
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   17.225027] usbcore: registered new interface driver usbserial
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   17.229557] usbcore: registered new interface driver usbserial_generic
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   17.236151] usbserial: USB Serial support registered for generic
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   17.444733] xt_time: kernel timezone is -0000
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   17.465828] usbcore: registered new interface driver cdc_ether
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   17.479866] usbcore: registered new interface driver cdc_ncm
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   17.633168] usbcore: registered new interface driver cp210x
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   17.637420] usbserial: USB Serial support registered for cp210x
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   17.682234] gspca_main: v2.14.0 registered
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   17.702719] usbcore: registered new interface driver sonixb
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   17.720342] usbcore: registered new interface driver sonixj
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   17.746527] usbcore: registered new interface driver gspca_zc3xx
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   17.773154] usbcore: registered new interface driver huawei_cdc_ncm
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   18.025314] PPP generic driver version 2.4.2
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   18.042190] PPP MPPE Compression module registered
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   18.053685] NET: Registered protocol family 24
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   18.073123] PPTP driver version 0.8.5
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   18.086743] usbcore: registered new interface driver qmi_wwan
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   18.107487] usbcore: registered new interface driver rndis_host
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   18.130241] usbcore: registered new interface driver sierra
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   18.134618] usbserial: USB Serial support registered for Sierra USB modem
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   18.168793] usbcore: registered new interface driver sierra_net
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   18.202310] usbcore: registered new interface driver usb_serial_simple
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   18.207529] usbserial: USB Serial support registered for carelink
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   18.213703] usbserial: USB Serial support registered for zio
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   18.219226] usbserial: USB Serial support registered for funsoft
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   18.225323] usbserial: USB Serial support registered for flashloader
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   18.231606] usbserial: USB Serial support registered for google
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   18.386795] usbcore: registered new interface driver uvcvideo
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   18.391157] USB Video Class driver (1.1.1)
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   18.563515] usbcore: registered new interface driver cdc_mbim
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   18.589889] l2tp_ppp: PPPoL2TP kernel driver, V2.0
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   18.608740] usbcore: registered new interface driver option
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   18.613153] usbserial: USB Serial support registered for GSM modem (1-port)
+Thu Sep 13 21:00:36 2018 kern.debug kernel: [   18.700157] ath: EEPROM regdomain: 0x0
+Thu Sep 13 21:00:36 2018 kern.debug kernel: [   18.700190] ath: EEPROM indicates default country code should be used
+Thu Sep 13 21:00:36 2018 kern.debug kernel: [   18.700204] ath: doing EEPROM country->regdmn map search
+Thu Sep 13 21:00:36 2018 kern.debug kernel: [   18.700233] ath: country maps to regdmn code: 0x3a
+Thu Sep 13 21:00:36 2018 kern.debug kernel: [   18.700249] ath: Country alpha2 being used: US
+Thu Sep 13 21:00:36 2018 kern.debug kernel: [   18.700263] ath: Regpair used: 0x3a
+Thu Sep 13 21:00:36 2018 kern.debug kernel: [   18.712442] ieee80211 phy0: Selected rate control algorithm 'minstrel_ht'
+Thu Sep 13 21:00:36 2018 kern.info kernel: [   18.720685] ieee80211 phy0: Atheros AR9330 Rev:1 mem=0xb8100000, irq=2
+Thu Sep 13 21:00:36 2018 user.info kernel: [   18.781551] kmodloader: done loading kernel modules from /etc/modules.d/
+Thu Sep 13 21:00:39 2018 daemon.notice procd: /etc/rc.d/S19initswitch: uci: Entry not found
+Thu Sep 13 21:00:39 2018 daemon.notice procd: /etc/rc.d/S19initswitch: uci: Entry not found
+Thu Sep 13 21:00:40 2018 user.notice : Added device handler type: 8021ad
+Thu Sep 13 21:00:40 2018 user.notice : Added device handler type: 8021q
+Thu Sep 13 21:00:40 2018 user.notice : Added device handler type: macvlan
+Thu Sep 13 21:00:42 2018 cron.info crond[1349]: crond (busybox 1.25.1) started, log level 8
+Thu Sep 13 21:00:43 2018 authpriv.info dropbear[1371]: Not backgrounding
+Thu Sep 13 21:00:46 2018 daemon.notice procd: /etc/rc.d/S50mjpg-streamer: /etc/rc.d/S50mjpg-streamer: device '/dev/video0' does not exist
+Thu Sep 13 21:00:49 2018 daemon.err insmod: module is already loaded - xt_multiport
+Thu Sep 13 21:00:49 2018 daemon.err insmod: module is already loaded - xt_connmark
+Thu Sep 13 21:00:50 2018 kern.info kernel: [   37.476390] IPv6: ADDRCONF(NETDEV_UP): lo: link is not ready
+Thu Sep 13 21:00:50 2018 kern.info kernel: [   37.498183] IPv6: ADDRCONF(NETDEV_UP): eth0: link is not ready
+Thu Sep 13 21:00:50 2018 kern.info kernel: [   37.526691] IPv6: ADDRCONF(NETDEV_UP): eth1: link is not ready
+Thu Sep 13 21:00:50 2018 kern.info kernel: [   37.603679] device eth1 entered promiscuous mode
+Thu Sep 13 21:00:50 2018 kern.info kernel: [   37.636942] br-lan: port 1(eth1) entered forwarding state
+Thu Sep 13 21:00:50 2018 kern.info kernel: [   37.641026] br-lan: port 1(eth1) entered forwarding state
+Thu Sep 13 21:00:50 2018 daemon.notice netifd: Interface 'lan' is enabled
+Thu Sep 13 21:00:50 2018 daemon.notice netifd: Interface 'lan' is setting up now
+Thu Sep 13 21:00:50 2018 daemon.notice netifd: Interface 'lan' is now up
+Thu Sep 13 21:00:50 2018 daemon.notice netifd: Interface 'loopback' is enabled
+Thu Sep 13 21:00:50 2018 daemon.notice netifd: Interface 'loopback' is setting up now
+Thu Sep 13 21:00:50 2018 daemon.notice netifd: Interface 'loopback' is now up
+Thu Sep 13 21:00:50 2018 kern.info kernel: [   37.760780] IPv6: ADDRCONF(NETDEV_UP): eth0: link is not ready
+Thu Sep 13 21:00:50 2018 daemon.notice netifd: Interface 'wan' is enabled
+Thu Sep 13 21:00:50 2018 daemon.notice netifd: Interface 'wan' is setting up now
+Thu Sep 13 21:00:50 2018 daemon.notice netifd: Interface 'wan' is now up
+Thu Sep 13 21:00:50 2018 daemon.notice netifd: bridge 'br-lan' link is up
+Thu Sep 13 21:00:50 2018 daemon.notice netifd: Interface 'lan' has link connectivity
+Thu Sep 13 21:00:50 2018 daemon.notice netifd: Network device 'lo' link is up
+Thu Sep 13 21:00:51 2018 daemon.notice netifd: Interface 'loopback' has link connectivity
+Thu Sep 13 21:00:51 2018 kern.info kernel: [   38.649532] br-lan: port 1(eth1) entered disabled state
+Thu Sep 13 21:00:51 2018 daemon.notice netifd: bridge 'br-lan' link is down
+Thu Sep 13 21:00:51 2018 daemon.notice netifd: Interface 'lan' has link connectivity loss
+Thu Sep 13 21:00:53 2018 user.notice firewall: Reloading firewall due to ifup of lan (br-lan)
+Thu Sep 13 21:00:54 2018 kern.info kernel: [   41.710950] eth0: link up (100Mbps/Full duplex)
+Thu Sep 13 21:00:54 2018 daemon.notice netifd: Network device 'eth0' link is up
+Thu Sep 13 21:00:54 2018 daemon.notice netifd: Interface 'wan' has link connectivity
+Thu Sep 13 21:00:54 2018 kern.info kernel: [   41.730537] IPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready
+Thu Sep 13 21:00:55 2018 daemon.err insmod: module is already loaded - xt_multiport
+Thu Sep 13 21:00:55 2018 daemon.err insmod: module is already loaded - xt_connmark
+Thu Sep 13 21:00:55 2018 daemon.err insmod: module is already loaded - xt_comment
+Thu Sep 13 21:00:55 2018 daemon.err hostapd: Configuration file: /var/run/hostapd-phy0.conf
+Thu Sep 13 21:00:55 2018 daemon.err insmod: module is already loaded - xt_length
+Thu Sep 13 21:00:55 2018 kern.info kernel: [   42.477162] device wlan0 entered promiscuous mode
+Thu Sep 13 21:00:55 2018 kern.info kernel: [   42.480677] br-lan: port 2(wlan0) entered forwarding state
+Thu Sep 13 21:00:55 2018 kern.info kernel: [   42.485953] br-lan: port 2(wlan0) entered forwarding state
+Thu Sep 13 21:00:55 2018 daemon.notice netifd: bridge 'br-lan' link is up
+Thu Sep 13 21:00:55 2018 daemon.notice netifd: Interface 'lan' has link connectivity
+Thu Sep 13 21:00:55 2018 daemon.err hostapd: Using interface wlan0 with hwaddr e4:95:6c:42:9a:42 and ssid 'MrGhosh'
+Thu Sep 13 21:00:55 2018 kern.info kernel: [   42.730667] br-lan: port 2(wlan0) entered disabled state
+Thu Sep 13 21:00:56 2018 daemon.notice netifd: bridge 'br-lan' link is down
+Thu Sep 13 21:00:56 2018 daemon.notice netifd: Interface 'lan' has link connectivity loss
+Thu Sep 13 21:00:57 2018 daemon.err miniupnpd[1988]: could not open lease file: /var/upnp.leases
+Thu Sep 13 21:00:57 2018 daemon.notice miniupnpd[1988]: HTTP listening on port 5000
+Thu Sep 13 21:00:57 2018 daemon.warn miniupnpd[1988]: no HTTP IPv6 address, disabling IPv6
+Thu Sep 13 21:00:57 2018 daemon.notice miniupnpd[1988]: Listening for NAT-PMP/PCP traffic on port 5351
+Thu Sep 13 21:00:57 2018 daemon.info dnsmasq[1994]: started, version 2.78 cachesize 300
+Thu Sep 13 21:00:57 2018 daemon.info dnsmasq[1994]: DNS service limited to local subnets
+Thu Sep 13 21:00:57 2018 daemon.info dnsmasq[1994]: compile time options: IPv6 GNU-getopt no-DBus no-i18n no-IDN DHCP no-DHCPv6 no-Lua TFTP no-conntrack no-ipset no-auth no-DNSSEC no-ID loop-detect inotify
+Thu Sep 13 21:00:57 2018 daemon.warn dnsmasq[1994]: warning: ignoring resolv-file flag because no-resolv is set
+Thu Sep 13 21:00:57 2018 daemon.info dnsmasq-dhcp[1994]: DHCP, IP range 192.168.8.100 -- 192.168.8.249, lease time 12h
+Thu Sep 13 21:00:57 2018 daemon.warn dnsmasq[1994]: ignoring nameserver 192.168.8.1 - local interface
+Thu Sep 13 21:00:57 2018 daemon.info dnsmasq[1994]: using local addresses only for domain lan
+Thu Sep 13 21:00:57 2018 daemon.info dnsmasq[1994]: using nameserver 208.67.222.222#5353
+Thu Sep 13 21:00:57 2018 daemon.info dnsmasq[1994]: using nameserver 208.67.220.220#5353
+Thu Sep 13 21:00:57 2018 daemon.info dnsmasq[1994]: read /etc/hosts - 4 addresses
+Thu Sep 13 21:00:57 2018 daemon.info dnsmasq[1994]: read /tmp/hosts/dhcp.cfg02411c - 2 addresses
+Thu Sep 13 21:00:57 2018 daemon.info dnsmasq-dhcp[1994]: read /etc/ethers - 0 addresses
+Thu Sep 13 21:00:58 2018 kern.info kernel: [   45.729409] br-lan: port 2(wlan0) entered forwarding state
+Thu Sep 13 21:00:58 2018 kern.info kernel: [   45.733611] br-lan: port 2(wlan0) entered forwarding state
+Thu Sep 13 21:00:58 2018 daemon.notice netifd: bridge 'br-lan' link is up
+Thu Sep 13 21:00:58 2018 daemon.notice netifd: Interface 'lan' has link connectivity
+Thu Sep 13 21:00:59 2018 daemon.notice hostapd: wlan0: interface state UNINITIALIZED->ENABLED
+Thu Sep 13 21:00:59 2018 daemon.notice hostapd: wlan0: AP-ENABLED
+Thu Sep 13 21:00:59 2018 daemon.notice netifd: Network device 'wlan0' link is up
+Thu Sep 13 21:01:00 2018 kern.info kernel: [   47.730515] br-lan: port 2(wlan0) entered forwarding state
+Thu Sep 13 21:01:04 2018 user.notice sourav: /etc/rc.local scripts running
+Thu Sep 13 21:01:04 2018 daemon.notice procd: /etc/rc.d/S96led: setting up led WLAN
+Thu Sep 13 21:01:06 2018 daemon.notice procd: /etc/rc.d/S99ss-server:
+Thu Sep 13 21:01:07 2018 cron.info crond[2398]: crond (busybox 1.25.1) started, log level 8
+Thu Sep 13 21:01:07 2018 daemon.info procd: - init complete -
+Thu Sep 13 21:01:08 2018 user.notice mwan3: ifup interface wan (eth0)
+Thu Sep 13 21:01:10 2018 user.notice firewall: Reloading firewall due to ifup of wan (eth0)
+Fri Sep 14 10:05:01 2018 daemon.info hostapd: wlan0: STA 4c:49:5c:61:db:4a IEEE 802.11: authenticated
+Fri Sep 14 10:05:01 2018 daemon.info hostapd: wlan0: STA 4c:49:5c:61:db:4a IEEE 802.11: associated (aid 1)
+Fri Sep 14 10:05:01 2018 daemon.notice hostapd: wlan0: AP-STA-CONNECTED 4c:49:5c:61:db:4a
+Fri Sep 14 10:05:01 2018 daemon.info hostapd: wlan0: STA 4c:49:5c:61:db:4a RADIUS: starting accounting session 7960FC285C352F8C
+Fri Sep 14 10:05:01 2018 daemon.info hostapd: wlan0: STA 4c:49:5c:61:db:4a WPA: pairwise key handshake completed (RSN)
+Fri Sep 14 10:05:04 2018 kern.notice kernel: [   61.490536] random: nonblocking pool is initialized
+Fri Sep 14 10:05:05 2018 daemon.info dnsmasq-dhcp[1994]: DHCPDISCOVER(br-lan) 4c:49:5c:61:db:4a
+Fri Sep 14 10:05:05 2018 daemon.info dnsmasq-dhcp[1994]: DHCPOFFER(br-lan) 192.168.8.103 4c:49:5c:61:db:4a
+Fri Sep 14 10:05:05 2018 daemon.info dnsmasq-dhcp[1994]: DHCPDISCOVER(br-lan) 4c:49:5c:61:db:4a
+Fri Sep 14 10:05:05 2018 daemon.info dnsmasq-dhcp[1994]: DHCPOFFER(br-lan) 192.168.8.103 4c:49:5c:61:db:4a
+Fri Sep 14 10:05:05 2018 daemon.info dnsmasq-dhcp[1994]: DHCPREQUEST(br-lan) 192.168.8.103 4c:49:5c:61:db:4a
+Fri Sep 14 10:05:05 2018 daemon.info dnsmasq-dhcp[1994]: DHCPACK(br-lan) 192.168.8.103 4c:49:5c:61:db:4a RedmiNote4-Redmi
+Fri Sep 14 10:05:05 2018 user.notice ddns-scripts[2723]: OpenDNS: PID '2723' started at 2018-09-14 10:05
+Fri Sep 14 10:05:06 2018 user.notice ddns-scripts[2722]: myddns_ipv4: PID '2722' started at 2018-09-14 10:05
+Fri Sep 14 10:05:06 2018 user.warn ddns-scripts[2723]: OpenDNS: Service section disabled! - TERMINATE
+Fri Sep 14 10:05:06 2018 user.warn ddns-scripts[2723]: OpenDNS: PID '2723' exit WITH ERROR '1' at 2018-09-14 10:05
+`
+var lines=log.split("\n")
+</script>
+<body>
+</html>
